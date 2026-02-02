@@ -10,11 +10,15 @@ const RightSidebar = () => {
   const { selectedNode, updateNode, assignees } = useWorkflowStore();
   const [label, setLabel] = useState('');
   const [description, setDescription] = useState('');
+  const [condition, setCondition] = useState('');
 
   useEffect(() => {
     if (selectedNode) {
       setLabel(selectedNode.data.label || '');
       setDescription(selectedNode.data.description || '');
+      if (selectedNode.data.type === NodeType.CONDITION) {
+        setCondition(selectedNode.data.condition || '');
+      }
     }
   }, [selectedNode]);
 
@@ -32,17 +36,33 @@ const RightSidebar = () => {
     }
   };
 
+  const handleConditionChange = (newCondition: string) => {
+    setCondition(newCondition);
+    if (selectedNode && selectedNode.data.type === NodeType.CONDITION) {
+      updateNode(selectedNode.id, { ...selectedNode.data, condition: newCondition });
+    }
+  };
+
   const handleApprovalRuleChange = (rule: ApprovalRule) => {
+    console.log('handleApprovalRuleChange called:', rule);
+    console.log('selectedNode:', selectedNode);
     if (selectedNode && selectedNode.data.type === NodeType.APPROVAL) {
+      console.log('Updating approval rule to:', rule);
       updateNode(selectedNode.id, { ...selectedNode.data, approvalRule: rule });
     }
   };
 
   const handleAssigneeToggle = (assigneeId: string) => {
+    console.log('handleAssigneeToggle called:', assigneeId);
+    console.log('selectedNode:', selectedNode);
     if (selectedNode && selectedNode.data.type === NodeType.APPROVAL) {
       const currentAssignees = selectedNode.data.assignees || [];
       const isAssigned = currentAssignees.some((a) => a.id === assigneeId);
       const assignee = assignees.find((a) => a.id === assigneeId);
+
+      console.log('Current assignees:', currentAssignees);
+      console.log('Is assigned:', isAssigned);
+      console.log('Found assignee:', assignee);
 
       if (!assignee) return;
 
@@ -50,6 +70,7 @@ const RightSidebar = () => {
         ? currentAssignees.filter((a) => a.id !== assigneeId)
         : [...currentAssignees, assignee];
 
+      console.log('New assignees:', newAssignees);
       updateNode(selectedNode.id, { ...selectedNode.data, assignees: newAssignees });
     }
   };
@@ -77,6 +98,7 @@ const RightSidebar = () => {
   }
 
   const isApprovalNode = selectedNode.data.type === NodeType.APPROVAL;
+  const isConditionNode = selectedNode.data.type === NodeType.CONDITION;
   const currentAssignees = isApprovalNode && selectedNode.data.type === NodeType.APPROVAL ? selectedNode.data.assignees || [] : [];
   const currentRule = isApprovalNode && selectedNode.data.type === NodeType.APPROVAL ? selectedNode.data.approvalRule || ApprovalRule.ALL : null;
 
@@ -164,6 +186,52 @@ const RightSidebar = () => {
         />
       </div>
 
+      {/* Condition Node specific properties */}
+      {isConditionNode && (
+        <div style={{ marginBottom: '16px' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '12px',
+              fontWeight: 600,
+              color: '#475569',
+              marginBottom: '6px',
+            }}
+          >
+            条件式
+          </label>
+          <input
+            type="text"
+            value={condition}
+            onChange={(e) => handleConditionChange(e.target.value)}
+            placeholder="例: amount > 10000"
+            style={{
+              width: '100%',
+              padding: '8px 12px',
+              border: '1px solid #e2e8f0',
+              borderRadius: '6px',
+              fontSize: '14px',
+              outline: 'none',
+              fontFamily: 'monospace',
+            }}
+            onFocus={(e) => (e.target.style.borderColor = '#3b82f6')}
+            onBlur={(e) => (e.target.style.borderColor = '#e2e8f0')}
+          />
+          <div
+            style={{
+              marginTop: '6px',
+              fontSize: '11px',
+              color: '#64748b',
+              padding: '8px',
+              background: '#f8fafc',
+              borderRadius: '4px',
+            }}
+          >
+            💡 条件式を入力すると、分岐のエッジラベルに表示されます
+          </div>
+        </div>
+      )}
+
       {/* Approval Node specific properties */}
       {isApprovalNode && (
         <>
@@ -205,9 +273,9 @@ const RightSidebar = () => {
                     value={rule.value}
                     checked={currentRule === rule.value}
                     onChange={() => handleApprovalRuleChange(rule.value)}
-                    style={{ marginRight: '8px' }}
+                    style={{ marginRight: '8px', cursor: 'pointer' }}
                   />
-                  {rule.label}
+                  <span style={{ cursor: 'pointer' }}>{rule.label}</span>
                 </label>
               ))}
             </div>
@@ -261,9 +329,9 @@ const RightSidebar = () => {
                         type="checkbox"
                         checked={isAssigned}
                         onChange={() => handleAssigneeToggle(assignee.id)}
-                        style={{ marginRight: '8px' }}
+                        style={{ marginRight: '8px', cursor: 'pointer' }}
                       />
-                      <div>
+                      <div style={{ cursor: 'pointer' }}>
                         <div style={{ fontWeight: 600 }}>{assignee.name}</div>
                         {assignee.role && (
                           <div style={{ fontSize: '11px', color: '#64748b' }}>

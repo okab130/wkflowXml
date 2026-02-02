@@ -16,6 +16,7 @@ import ReactFlow, {
 import type {
   Connection,
   NodeTypes,
+  EdgeTypes,
   ReactFlowInstance,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -23,11 +24,14 @@ import 'reactflow/dist/style.css';
 import { useWorkflowStore } from '../store/workflowStore';
 import type { WorkflowNode, WorkflowEdge } from '../types';
 
-// Import custom nodes (we'll create these next)
+// Import custom nodes
 import StartNode from './nodes/StartNode';
 import ApprovalNode from './nodes/ApprovalNode';
 import EndNode from './nodes/EndNode';
 import ConditionNode from './nodes/ConditionNode';
+
+// Import custom edges
+import CustomEdge from './edges/CustomEdge';
 
 // Define node types for React Flow
 const nodeTypes: NodeTypes = {
@@ -35,6 +39,11 @@ const nodeTypes: NodeTypes = {
   approvalNode: ApprovalNode,
   conditionNode: ConditionNode,
   endNode: EndNode,
+};
+
+// Define edge types for React Flow
+const edgeTypes: EdgeTypes = {
+  default: CustomEdge,
 };
 
 interface FlowCanvasProps {
@@ -76,18 +85,29 @@ const FlowCanvas = ({ onInit }: FlowCanvasProps) => {
   // Handle new connections
   const onConnect = useCallback(
     (connection: Connection) => {
-      const newEdge = {
+      // Find source node to check if it's a condition node
+      const sourceNode = localNodes.find((n) => n.id === connection.source);
+      
+      const newEdge: any = {
         ...connection,
         id: `edge-${connection.source}-${connection.target}`,
-        type: 'smoothstep',
+        type: 'default', // Use our custom edge type
         animated: true,
       };
+
+      // If source is a condition node, add its condition to the edge
+      if (sourceNode?.type === 'conditionNode' && sourceNode.data.type === 'conditionNode') {
+        newEdge.data = {
+          condition: sourceNode.data.condition || '条件未設定',
+        };
+        newEdge.label = sourceNode.data.condition || '条件未設定';
+      }
       
       const updatedEdges = addEdge(newEdge, localEdges);
       setLocalEdges(updatedEdges);
       setEdges(updatedEdges as WorkflowEdge[]);
     },
-    [localEdges, setLocalEdges, setEdges]
+    [localNodes, localEdges, setLocalEdges, setEdges]
   );
 
   // Handle node click
@@ -124,6 +144,7 @@ const FlowCanvas = ({ onInit }: FlowCanvasProps) => {
         onNodeDragStop={onNodeDragStop}
         onInit={onInit}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         fitView
         attributionPosition="bottom-left"
       >

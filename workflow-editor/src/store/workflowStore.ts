@@ -13,12 +13,37 @@ import type {
   NodeData,
 } from '../types';
 
+// Initial mock assignees
+const initialAssignees: Assignee[] = [
+  {
+    id: uuidv4(),
+    name: '田中太郎',
+    email: 'tanaka@example.com',
+    role: '部長',
+    department: '営業部',
+  },
+  {
+    id: uuidv4(),
+    name: '佐藤花子',
+    email: 'sato@example.com',
+    role: '課長',
+    department: '経理部',
+  },
+  {
+    id: uuidv4(),
+    name: '鈴木一郎',
+    email: 'suzuki@example.com',
+    role: '主任',
+    department: '総務部',
+  },
+];
+
 export const useWorkflowStore = create<AppState>((set, get) => ({
   // Initial state
   currentWorkflow: null,
   nodes: [],
   edges: [],
-  assignees: [],
+  assignees: initialAssignees,
   selectedNode: null,
 
   // Node actions
@@ -37,14 +62,24 @@ export const useWorkflowStore = create<AppState>((set, get) => ({
   },
 
   updateNode: (nodeId: string, data: Partial<NodeData>) => {
-    set((state) => ({
-      nodes: state.nodes.map((node) => {
+    set((state) => {
+      const updatedNodes = state.nodes.map((node) => {
         if (node.id === nodeId) {
           return { ...node, data: { ...node.data, ...data } as NodeData };
         }
         return node;
-      }),
-    }));
+      });
+      
+      // Also update selectedNode if it's the same node
+      const updatedSelectedNode = state.selectedNode?.id === nodeId
+        ? updatedNodes.find(n => n.id === nodeId) || state.selectedNode
+        : state.selectedNode;
+      
+      return {
+        nodes: updatedNodes,
+        selectedNode: updatedSelectedNode,
+      };
+    });
   },
 
   deleteNode: (nodeId: string) => {

@@ -4,6 +4,7 @@
 
 import type { DragEvent } from 'react';
 import { NodeType } from '../../types';
+import AssigneeManager from './AssigneeManager';
 
 interface NodePaletteItem {
   type: NodeType;
@@ -159,6 +160,9 @@ const LeftSidebar = () => {
           <li style={{ marginBottom: '4px' }}>ノードを接続</li>
         </ol>
       </div>
+
+      {/* Assignee Manager */}
+      <AssigneeManager />
     </div>
   );
 };
