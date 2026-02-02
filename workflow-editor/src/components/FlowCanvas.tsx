@@ -26,6 +26,7 @@ import type { WorkflowNode, WorkflowEdge } from '../types';
 
 // Import custom nodes
 import StartNode from './nodes/StartNode';
+import ApplicationNode from './nodes/ApplicationNode';
 import ApprovalNode from './nodes/ApprovalNode';
 import EndNode from './nodes/EndNode';
 import ConditionNode from './nodes/ConditionNode';
@@ -36,6 +37,7 @@ import CustomEdge from './edges/CustomEdge';
 // Define node types for React Flow
 const nodeTypes: NodeTypes = {
   startNode: StartNode,
+  applicationNode: ApplicationNode,
   approvalNode: ApprovalNode,
   conditionNode: ConditionNode,
   endNode: EndNode,

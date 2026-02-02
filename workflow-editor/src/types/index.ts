@@ -11,6 +11,7 @@ import type { Node as ReactFlowNode, Edge as ReactFlowEdge } from 'reactflow';
  */
 export const NodeType = {
   START: 'startNode',
+  APPLICATION: 'applicationNode',
   APPROVAL: 'approvalNode',
   CONDITION: 'conditionNode',
   END: 'endNode',
@@ -61,6 +62,15 @@ export interface StartNodeData extends BaseNodeData {
 }
 
 /**
+ * Data for Application Node (申請ノード)
+ */
+export interface ApplicationNodeData extends BaseNodeData {
+  type: typeof NodeType.APPLICATION;
+  assignees: Assignee[]; // Applicant (usually only 1 person)
+  description?: string;
+}
+
+/**
  * Data for Approval Node
  */
 export interface ApprovalNodeData extends BaseNodeData {
@@ -87,7 +97,7 @@ export interface EndNodeData extends BaseNodeData {
 /**
  * Union type for all node data
  */
-export type NodeData = StartNodeData | ApprovalNodeData | ConditionNodeData | EndNodeData;
+export type NodeData = StartNodeData | ApplicationNodeData | ApprovalNodeData | ConditionNodeData | EndNodeData;
 
 // ========== React Flow Types ==========
 

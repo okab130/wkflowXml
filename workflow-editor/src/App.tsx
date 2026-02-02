@@ -88,6 +88,18 @@ function App() {
             },
           };
           break;
+        case NodeType.APPLICATION:
+          newNode = {
+            id: nodeId,
+            type: 'applicationNode',
+            position,
+            data: {
+              type: NodeType.APPLICATION,
+              label: '申請',
+              assignees: [],
+            },
+          };
+          break;
         case NodeType.APPROVAL:
           newNode = {
             id: nodeId,

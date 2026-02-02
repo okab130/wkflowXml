@@ -97,9 +97,14 @@ const RightSidebar = () => {
     );
   }
 
+  const isApplicationNode = selectedNode.data.type === NodeType.APPLICATION;
   const isApprovalNode = selectedNode.data.type === NodeType.APPROVAL;
   const isConditionNode = selectedNode.data.type === NodeType.CONDITION;
-  const currentAssignees = isApprovalNode && selectedNode.data.type === NodeType.APPROVAL ? selectedNode.data.assignees || [] : [];
+  
+  const currentAssignees = 
+    (isApplicationNode && selectedNode.data.type === NodeType.APPLICATION) ? selectedNode.data.assignees || [] :
+    (isApprovalNode && selectedNode.data.type === NodeType.APPROVAL) ? selectedNode.data.assignees || [] : [];
+  
   const currentRule = isApprovalNode && selectedNode.data.type === NodeType.APPROVAL ? selectedNode.data.approvalRule || ApprovalRule.ALL : null;
 
   return (
@@ -232,6 +237,97 @@ const RightSidebar = () => {
         </div>
       )}
 
+      {/* Application Node specific properties */}
+      {isApplicationNode && (
+        <>
+          {/* Applicant (申請者) */}
+          <div style={{ marginBottom: '16px' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: '#475569',
+                marginBottom: '8px',
+              }}
+            >
+              申請者 ({currentAssignees.length}名)
+            </label>
+            {assignees.length === 0 ? (
+              <div
+                style={{
+                  padding: '12px',
+                  background: '#fef3c7',
+                  border: '1px solid #fcd34d',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  color: '#92400e',
+                }}
+              >
+                担当者が登録されていません
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {assignees.map((assignee) => {
+                  const isAssigned = currentAssignees.some((a) => a.id === assignee.id);
+                  return (
+                    <label
+                      key={assignee.id}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '8px',
+                        background: isAssigned ? '#f3e8ff' : 'white',
+                        border: isAssigned ? '2px solid #a78bfa' : '1px solid #e2e8f0',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="applicant"
+                        checked={isAssigned}
+                        onChange={() => {
+                          // For application node, only allow single assignee
+                          if (selectedNode && selectedNode.data.type === NodeType.APPLICATION) {
+                            updateNode(selectedNode.id, { 
+                              ...selectedNode.data, 
+                              assignees: [assignee] 
+                            });
+                          }
+                        }}
+                        style={{ marginRight: '8px', cursor: 'pointer' }}
+                      />
+                      <div style={{ cursor: 'pointer' }}>
+                        <div style={{ fontWeight: 600 }}>{assignee.name}</div>
+                        {assignee.role && (
+                          <div style={{ fontSize: '11px', color: '#64748b' }}>
+                            {assignee.role}
+                          </div>
+                        )}
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+            <div
+              style={{
+                marginTop: '8px',
+                fontSize: '11px',
+                color: '#64748b',
+                padding: '8px',
+                background: '#f8fafc',
+                borderRadius: '4px',
+              }}
+            >
+              💡 申請ノードは1名のみ選択可能です
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Approval Node specific properties */}
       {isApprovalNode && (
         <>
@@ -362,6 +458,7 @@ const RightSidebar = () => {
         <div style={{ fontWeight: 600, marginBottom: '4px' }}>ノードタイプ</div>
         <div>
           {selectedNode.data.type === NodeType.START && '開始ノード'}
+          {selectedNode.data.type === NodeType.APPLICATION && '申請ノード'}
           {selectedNode.data.type === NodeType.APPROVAL && '承認ノード'}
           {selectedNode.data.type === NodeType.CONDITION && '条件分岐'}
           {selectedNode.data.type === NodeType.END && '終了ノード'}

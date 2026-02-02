@@ -23,9 +23,16 @@ const nodeItems: NodePaletteItem[] = [
     color: '#4ade80',
   },
   {
+    type: NodeType.APPLICATION,
+    label: '申請ノード',
+    icon: '📝',
+    description: '申請を提出する',
+    color: '#a78bfa',
+  },
+  {
     type: NodeType.APPROVAL,
     label: '承認ノード',
-    icon: '📝',
+    icon: '✓',
     description: '承認処理を行う',
     color: '#60a5fa',
   },
