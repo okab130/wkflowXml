@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import FlowCanvas from './components/FlowCanvas';
 import LeftSidebar from './components/sidebar/LeftSidebar';
 import RightSidebar from './components/sidebar/RightSidebar';
+import Toolbar from './components/toolbar/Toolbar';
 import { useWorkflowStore } from './store/workflowStore';
 import { NodeType, ApprovalRule } from './types';
 import type { WorkflowNode } from './types';
@@ -147,29 +148,39 @@ function App() {
   return (
     <div style={{ 
       display: 'flex', 
+      flexDirection: 'column',
       height: '100vh', 
       width: '100vw',
       overflow: 'hidden',
       background: '#f8fafc'
     }}>
-      <LeftSidebar />
+      <Toolbar />
       
-      <div 
-        ref={reactFlowWrapper}
-        style={{ 
-          flex: 1, 
-          height: '100%',
-          position: 'relative'
-        }}
-        onDrop={onDrop}
-        onDragOver={onDragOver}
-      >
-        <ReactFlowProvider>
-          <FlowCanvas onInit={setReactFlowInstance} />
-        </ReactFlowProvider>
+      <div style={{
+        display: 'flex',
+        flex: 1,
+        marginTop: '64px',
+        overflow: 'hidden'
+      }}>
+        <LeftSidebar />
+        
+        <div 
+          ref={reactFlowWrapper}
+          style={{ 
+            flex: 1, 
+            height: '100%',
+            position: 'relative'
+          }}
+          onDrop={onDrop}
+          onDragOver={onDragOver}
+        >
+          <ReactFlowProvider>
+            <FlowCanvas onInit={setReactFlowInstance} />
+          </ReactFlowProvider>
+        </div>
+        
+        <RightSidebar />
       </div>
-      
-      <RightSidebar />
     </div>
   );
 }

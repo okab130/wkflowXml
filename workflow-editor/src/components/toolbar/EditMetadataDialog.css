@@ -1,0 +1,25 @@
+/**
+ * Edit Metadata Dialog Styles
+ */
+
+.edit-metadata-dialog {
+  max-width: 500px;
+  width: 90%;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Styles are shared with SaveDialog.css */
+/* This ensures consistency across dialogs */
+
+/* Responsive */
+@media (max-width: 640px) {
+  .edit-metadata-dialog {
+    width: 95%;
+    max-width: none;
+  }
+}

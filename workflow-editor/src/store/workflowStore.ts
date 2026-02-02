@@ -167,17 +167,23 @@ export const useWorkflowStore = create<AppState>((set, get) => ({
 
     set({ currentWorkflow: workflow });
 
-    // Save to localStorage
-    const savedWorkflows = JSON.parse(localStorage.getItem('workflows') || '[]');
-    const existingIndex = savedWorkflows.findIndex((w: Workflow) => w.id === workflow.id);
+    // Save to localStorage using storage helper
+    try {
+      const savedWorkflows = JSON.parse(localStorage.getItem('workflows') || '[]');
+      const existingIndex = savedWorkflows.findIndex((w: Workflow) => w.id === workflow.id);
 
-    if (existingIndex >= 0) {
-      savedWorkflows[existingIndex] = workflow;
-    } else {
-      savedWorkflows.push(workflow);
+      if (existingIndex >= 0) {
+        savedWorkflows[existingIndex] = workflow;
+      } else {
+        savedWorkflows.push(workflow);
+      }
+
+      localStorage.setItem('workflows', JSON.stringify(savedWorkflows));
+      return workflow;
+    } catch (error) {
+      console.error('Failed to save workflow:', error);
+      throw error;
     }
-
-    localStorage.setItem('workflows', JSON.stringify(savedWorkflows));
   },
 
   clearWorkflow: () => {
